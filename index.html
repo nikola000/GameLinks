@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N's Game Arcade</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Righteous&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-green: #39ff14;
+            --neon-pink: #ff10f0;
+            --neon-blue: #00d9ff;
+            --dark-bg: #0a0a0a;
+            --card-bg: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --border-color: #333333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(var(--border-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.15;
+            z-index: 0;
+            animation: gridScroll 20s linear infinite;
+        }
+
+        @keyframes gridScroll {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* Neon glow effect */
+        .neon-glow {
+            text-shadow: 
+                0 0 10px var(--neon-green),
+                0 0 20px var(--neon-green),
+                0 0 30px var(--neon-green);
+        }
+
+        header {
+            position: relative;
+            z-index: 10;
+            padding: 4rem 2rem 2rem;
+            text-align: center;
+            border-bottom: 3px solid var(--neon-green);
+            background: linear-gradient(180deg, rgba(57, 255, 20, 0.05) 0%, transparent 100%);
+        }
+
+        h1 {
+            font-family: 'Righteous', cursive;
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+            animation: glitchTitle 3s infinite;
+            position: relative;
+        }
+
+        @keyframes glitchTitle {
+            0%, 90%, 100% { transform: translate(0, 0); }
+            91% { transform: translate(-2px, 1px); }
+            92% { transform: translate(2px, -1px); }
+            93% { transform: translate(0, 0); }
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+        }
+
+        main {
+            position: relative;
+            z-index: 10;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .game-card {
+            position: relative;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            padding: 2rem;
+            transition: all 0.3s ease;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .game-card:nth-child(1) { animation-delay: 0.1s; }
+        .game-card:nth-child(2) { animation-delay: 0.2s; }
+        .game-card:nth-child(3) { animation-delay: 0.3s; }
+        .game-card:nth-child(4) { animation-delay: 0.4s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--neon-green), var(--neon-blue), var(--neon-pink), var(--neon-green));
+            background-size: 300% 300%;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+            animation: gradientShift 3s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .game-card:hover::before {
+            opacity: 1;
+        }
+
+        .game-card:hover {
+            transform: translateY(-8px);
+            border-color: transparent;
+        }
+
+        .game-number {
+            font-family: 'Righteous', cursive;
+            font-size: 3rem;
+            color: var(--neon-green);
+            line-height: 1;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        .game-title {
+            font-family: 'Righteous', cursive;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            letter-spacing: 0.05em;
+        }
+
+        .game-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .game-tech {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tech-tag {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            border: 1px solid var(--border-color);
+            color: var(--neon-blue);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .game-link {
+            display: inline-block;
+            padding: 0.75rem 2rem;
+            background: transparent;
+            border: 2px solid var(--neon-green);
+            color: var(--neon-green);
+            text-decoration: none;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--neon-green);
+            transition: left 0.3s ease;
+            z-index: -1;
+        }
+
+        .game-link:hover::before {
+            left: 0;
+        }
+
+        .game-link:hover {
+            color: var(--dark-bg);
+        }
+
+        .game-link.coming-soon {
+            border-color: var(--text-secondary);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+        }
+
+        .game-link.coming-soon::before {
+            display: none;
+        }
+
+        footer {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        /* Floating pixel decorations */
+        .pixel-decoration {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: var(--neon-green);
+            opacity: 0.3;
+            animation: float 15s infinite ease-in-out;
+            z-index: 1;
+        }
+
+        .pixel-decoration:nth-child(2) { 
+            top: 20%; 
+            left: 10%; 
+            animation-delay: -2s; 
+            background: var(--neon-pink);
+        }
+
+        .pixel-decoration:nth-child(3) { 
+            top: 60%; 
+            right: 15%; 
+            animation-delay: -4s;
+            background: var(--neon-blue);
+        }
+
+        .pixel-decoration:nth-child(4) { 
+            bottom: 30%; 
+            left: 20%; 
+            animation-delay: -6s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(20px, -20px) rotate(90deg); }
+            50% { transform: translate(-20px, 20px) rotate(180deg); }
+            75% { transform: translate(20px, 20px) rotate(270deg); }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 3rem 1rem 1.5rem;
+            }
+
+            .games-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            main {
+                padding: 2rem 1rem;
+            }
+        }
+
+        /* Scanline effect */
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 50%,
+                rgba(0, 0, 0, 0.1) 51%
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0.1;
+        }
+    </style>
+</head>
+<body>
+    <div class="scanline"></div>
+    <div class="pixel-decoration"></div>
+    <div class="pixel-decoration"></div>
+    <div class="pixel-decoration"></div>
+    <div class="pixel-decoration"></div>
+
+    <header>
+        <h1 class="neon-glow">GAME ARCADE</h1>
+        <p class="subtitle">Indie Projects & Experiments</p>
+    </header>
+
+    <main>
+        <div class="games-grid">
+            <div class="game-card">
+                <div class="game-number">01</div>
+                <h2 class="game-title">Shape Duel</h2>
+                <p class="game-description">
+                    Real-time multiplayer drawing game. Race against opponents to replicate shapes with precision. 
+                    Features advanced scoring algorithms, reconnection logic, and live matchmaking.
+                </p>
+                <div class="game-tech">
+                    <span class="tech-tag">Node.js</span>
+                    <span class="tech-tag">Socket.IO</span>
+                    <span class="tech-tag">SQLite</span>
+                    <span class="tech-tag">PWA</span>
+                </div>
+                <a href="https://shapeduel.online" target="_blank" class="game-link">Play Now</a>
+            </div>
+
+            <div class="game-card">
+                <div class="game-number">02</div>
+                <h2 class="game-title">Motion Pong</h2>
+                <p class="game-description">
+                    Hand-tracking powered Pong using MediaPipe. Control the paddle with your hand movements. 
+                    Features cyberpunk aesthetics, particle effects, and Web Audio API integration.
+                </p>
+                <div class="game-tech">
+                    <span class="tech-tag">MediaPipe</span>
+                    <span class="tech-tag">Canvas</span>
+                    <span class="tech-tag">Web Audio</span>
+                    <span class="tech-tag">Hand Tracking</span>
+                </div>
+                <a href="https://motionpong.netlify.app/" target="_blank" class="game-link">Play Now</a>
+            </div>
+            
+            <div class="game-card">
+                <div class="game-number">03</div>
+                <h2 class="game-title">Undercover: Mr White</h2>
+                <p class="game-description">
+                    Social deduction party game inspired by hidden roles. Players receive secret words—except the mysterious Mr White. 
+                    Use discussion, deception, and logic to uncover impostors or survive undetected.
+                </p>
+                <div class="game-tech">
+                    <span class="tech-tag">JavaScript</span>
+                    <span class="tech-tag">Multiplayer</span>
+                    <span class="tech-tag">Game Logic</span>
+                    <span class="tech-tag">UI/UX</span>
+                </div>
+                <a href="https://undercover.shapeduel.online/" target="_blank" class="game-link">Play Now</a>
+            </div>
+
+            <div class="game-card">
+                <div class="game-number">04</div>
+                <h2 class="game-title">KiksOks</h2>
+                <p class="game-description">
+                    A strategic twist on tic-tac-toe. Each player can only have three active pieces—placing a fourth removes the oldest one. 
+                    Forces dynamic thinking, repositioning, and long-term planning.
+                </p>
+                <div class="game-tech">
+                    <span class="tech-tag">JavaScript</span>
+                    <span class="tech-tag">Game Mechanics</span>
+                    <span class="tech-tag">Strategy</span>
+                    <span class="tech-tag">DOM</span>
+                </div>
+                <a href="https://kiksoks.netlify.app/kiksoks" target="_blank" class="game-link">Play Now</a>
+            </div>
+
+            <div class="game-card">
+                <div class="game-number">05</div>
+                <h2 class="game-title">Connect4 Spin</h2>
+                <p class="game-description">
+                    Reinvented Connect Four with a twist—literally. Introduces rotation mechanics that shift the board state, 
+                    turning predictable gameplay into chaotic and strategic battles.
+                </p>
+                <div class="game-tech">
+                    <span class="tech-tag">JavaScript</span>
+                    <span class="tech-tag">Game Physics</span>
+                    <span class="tech-tag">Grid System</span>
+                    <span class="tech-tag">Animations</span>
+                </div>
+                <a href="https://kiksoks.netlify.app/connect4/game.html" target="_blank" class="game-link">Play Now</a>
+            </div>
+
+            <!-- <div class="game-card">
+                <div class="game-number">04</div>
+                <h2 class="game-title">Naruto Strategy</h2>
+                <p class="game-description">
+                    Turn-based strategy game with chakra system and weapon mechanics. Navigate tactical maps 
+                    with BFS pathfinding. Local multiplayer with pick-up items and strategic combat.
+                </p>
+                <div class="game-tech">
+                    <span class="tech-tag">Vanilla JS</span>
+                    <span class="tech-tag">BFS</span>
+                    <span class="tech-tag">Canvas</span>
+                    <span class="tech-tag">Strategy</span>
+                </div>
+                <a href="#" class="game-link coming-soon">Coming Soon</a>
+            </div>
+        </div> -->
+    </main>
+
+    <footer>
+        <p>&copy; 2025 N's Game Arcade // Belgrade, Serbia // Built with <span style="color: var(--neon-pink);">♥</span></p>
+    </footer>
+
+    <script>
+        // Add glitch effect on title occasionally
+        const title = document.querySelector('h1');
+        setInterval(() => {
+            if (Math.random() > 0.7) {
+                title.style.animation = 'none';
+                setTimeout(() => {
+                    title.style.animation = '';
+                }, 100);
+            }
+        }, 5000);
+
+        // Parallax effect on cards
+        document.addEventListener('mousemove', (e) => {
+            const cards = document.querySelectorAll('.game-card');
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+
+            cards.forEach((card, index) => {
+                const offsetX = (x - 0.5) * 20 * (index % 2 === 0 ? 1 : -1);
+                const offsetY = (y - 0.5) * 20 * (index % 2 === 0 ? 1 : -1);
+                card.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+            });
+        });
+    </script>
+</body>
+</html>
